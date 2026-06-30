@@ -32,6 +32,12 @@ android {
     }
 }
 
+kotlin {
+    compilerOptions {
+        freeCompilerArgs.add("-XXLanguage:+ExplicitBackingFields")
+    }
+}
+
 dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
