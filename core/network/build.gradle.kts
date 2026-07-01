@@ -20,7 +20,18 @@ android {
     }
 }
 
+kotlin {
+    compilerOptions {
+        freeCompilerArgs.add("-XXLanguage:+ContextParameters")
+    }
+}
+
 dependencies {
+    implementation(projects.core.model)
+
+    // Arrow
+    implementation(libs.arrow.core)
+
     // Hilt
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)

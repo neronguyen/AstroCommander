@@ -6,6 +6,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import io.github.neronguyen.astrocommander.core.network.AscomNetworkDataSource
 import io.github.neronguyen.astrocommander.core.network.ktor.KtorAscomNetworkClient
+import io.github.neronguyen.astrocommander.core.network.ktor.KtorClient
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.HttpTimeout
@@ -22,7 +23,8 @@ internal object NetworkModule {
     @Provides
     @Singleton
     fun provideAscomNetworkDataSource(httpClient: HttpClient): AscomNetworkDataSource {
-        return KtorAscomNetworkClient(httpClient)
+        val ktorClient = KtorClient(httpClient)
+        return KtorAscomNetworkClient(ktorClient)
     }
 
     @Provides
