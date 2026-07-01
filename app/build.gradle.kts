@@ -41,6 +41,8 @@ kotlin {
 }
 
 dependencies {
+    implementation(projects.core.network)
+
     // Androidx
     implementation(libs.androidx.activity.compose)
 
