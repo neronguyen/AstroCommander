@@ -4,11 +4,11 @@ import android.util.Log
 import arrow.core.raise.Raise
 import io.github.neronguyen.astrocommander.core.model.error.DataError
 import io.github.neronguyen.astrocommander.core.network.AscomNetworkDataSource
+import io.github.neronguyen.astrocommander.core.network.model.PlaceholderJson
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonElement
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import retrofit2.Response
@@ -23,7 +23,7 @@ import java.nio.channels.UnresolvedAddressException
 private interface RetrofitAscomNetworkApi {
 
     @GET("todos/1")
-    suspend fun getPlaceholderJson(): Response<JsonElement>
+    suspend fun getPlaceholderJson(): Response<PlaceholderJson>
 }
 
 internal class RetrofitAscomNetworkClient(
@@ -42,10 +42,10 @@ internal class RetrofitAscomNetworkClient(
 
 
     context(raise: Raise<DataError.Network>)
-    override suspend fun getPlaceholderJson(): String {
+    override suspend fun getPlaceholderJson(): PlaceholderJson {
         return safeCall {
             networkClient.getPlaceholderJson()
-        }.toString()
+        }
     }
 
     context(raise: Raise<DataError.Network>)

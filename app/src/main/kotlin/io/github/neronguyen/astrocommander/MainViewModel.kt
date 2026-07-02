@@ -23,7 +23,7 @@ class MainViewModel @Inject constructor(
             }.onLeft { error ->
                 name.update { "Error: $error" }
             }.onRight { result ->
-                name.update { result }
+                name.update { result.title }
             }
         }
     }
