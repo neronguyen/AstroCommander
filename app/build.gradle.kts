@@ -44,6 +44,7 @@ kotlin {
 dependencies {
     implementation(projects.core.model)
     implementation(projects.core.network)
+    implementation(projects.core.database)
 
     // Androidx
     implementation(libs.androidx.activity.compose)
