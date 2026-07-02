@@ -37,14 +37,19 @@ android {
 kotlin {
     compilerOptions {
         freeCompilerArgs.add("-XXLanguage:+ExplicitBackingFields")
+        freeCompilerArgs.add("-XXLanguage:+ContextParameters")
     }
 }
 
 dependencies {
+    implementation(projects.core.model)
     implementation(projects.core.network)
 
     // Androidx
     implementation(libs.androidx.activity.compose)
+
+    // Arrow
+    implementation(libs.arrow.core)
 
     // Compose
     implementation(platform(libs.androidx.compose.bom))

@@ -2,6 +2,7 @@ package io.github.neronguyen.astrocommander
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import arrow.core.raise.context.either
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.neronguyen.astrocommander.core.network.AscomNetworkDataSource
 import jakarta.inject.Inject
@@ -17,8 +18,13 @@ class MainViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            val json = networkDataSource.getPlaceholderJson()
-            name.update { json }
+            either {
+                networkDataSource.getPlaceholderJson()
+            }.onLeft { error ->
+                name.update { "Error: $error" }
+            }.onRight { result ->
+                name.update { result }
+            }
         }
     }
 
