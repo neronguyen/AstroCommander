@@ -22,7 +22,7 @@ class MainViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             either {
-                networkDataSource.getPlaceholderJson()
+                networkDataSource.getPlaceholderJson(1)
             }.onLeft { error ->
                 name.update { "Error: $error" }
             }.onRight { result ->

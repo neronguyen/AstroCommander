@@ -7,5 +7,5 @@ import io.github.neronguyen.astrocommander.core.network.model.PlaceholderJson
 interface AscomNetworkDataSource {
 
     context(raise: Raise<DataError.Network>)
-    suspend fun getPlaceholderJson(): PlaceholderJson
+    suspend fun getPlaceholderJson(id: Int): PlaceholderJson
 }

@@ -1,6 +1,5 @@
 package io.github.neronguyen.astrocommander.core.network.retrofit
 
-import android.util.Log
 import arrow.core.raise.Raise
 import io.github.neronguyen.astrocommander.core.model.error.DataError
 import io.github.neronguyen.astrocommander.core.network.AscomNetworkDataSource
@@ -15,6 +14,7 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import retrofit2.http.GET
+import retrofit2.http.Path
 import java.net.ConnectException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
@@ -22,8 +22,10 @@ import java.nio.channels.UnresolvedAddressException
 
 private interface RetrofitAscomNetworkApi {
 
-    @GET("todos/1")
-    suspend fun getPlaceholderJson(): Response<PlaceholderJson>
+    @GET("todos/{id}")
+    suspend fun getPlaceholderJson(
+        @Path("id") id: Int
+    ): Response<PlaceholderJson>
 }
 
 internal class RetrofitAscomNetworkClient(
@@ -42,9 +44,9 @@ internal class RetrofitAscomNetworkClient(
 
 
     context(raise: Raise<DataError.Network>)
-    override suspend fun getPlaceholderJson(): PlaceholderJson {
+    override suspend fun getPlaceholderJson(id: Int): PlaceholderJson {
         return safeCall {
-            networkClient.getPlaceholderJson()
+            networkClient.getPlaceholderJson(id)
         }
     }
 
@@ -65,7 +67,6 @@ internal class RetrofitAscomNetworkClient(
             raise.raise(DataError.Network.Serialization)
         } catch (e: Exception) {
             currentCoroutineContext().ensureActive()
-            Log.e(TAG, "safeCall: ", e)
             raise.raise(e.asNetworkError())
         }
     }
@@ -77,13 +78,6 @@ internal class RetrofitAscomNetworkClient(
 
         is SocketTimeoutException -> DataError.Network.RequestTimeout
 
-        else -> {
-            Log.e(TAG, "asNetworkError: ", this)
-            DataError.Network.Unknown
-        }
-    }
-
-    companion object {
-        private const val TAG = "RetrofitAscomNetworkClient"
+        else -> DataError.Network.Unknown
     }
 }
