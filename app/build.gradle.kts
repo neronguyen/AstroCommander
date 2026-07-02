@@ -30,6 +30,7 @@ android {
     }
 
     compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
     }
 }
@@ -48,6 +49,8 @@ dependencies {
 
     // Androidx
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.hilt.lifecycle.viewModelCompose)
+    implementation(libs.androidx.work.ktx)
 
     // Arrow
     implementation(libs.arrow.core)
@@ -60,6 +63,7 @@ dependencies {
 
     // Hilt
     implementation(libs.hilt.android)
-    implementation(libs.androidx.hilt.lifecycle.viewModelCompose)
+    implementation(libs.hilt.ext.work)
     ksp(libs.hilt.compiler)
+    ksp(libs.hilt.ext.compiler)
 }
