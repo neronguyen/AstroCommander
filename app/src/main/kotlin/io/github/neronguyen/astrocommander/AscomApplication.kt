@@ -1,7 +1,10 @@
 package io.github.neronguyen.astrocommander
 
 import android.app.Application
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Context
+import androidx.core.content.getSystemService
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.BackoffPolicy
 import androidx.work.Configuration
@@ -33,6 +36,7 @@ class AscomApplication : Application(), Configuration.Provider, SingletonImageLo
 
     override fun onCreate() {
         super.onCreate()
+        createNotificationChannel()
         scheduleRandomIdWork()
     }
 
@@ -40,7 +44,7 @@ class AscomApplication : Application(), Configuration.Provider, SingletonImageLo
         return imageLoader
     }
 
-    fun scheduleRandomIdWork() {
+    private fun scheduleRandomIdWork() {
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
@@ -57,5 +61,17 @@ class AscomApplication : Application(), Configuration.Provider, SingletonImageLo
             ExistingWorkPolicy.REPLACE,
             workRequest
         )
+    }
+
+    private fun createNotificationChannel() {
+        val name = "Random ID Notification"
+        val importance = NotificationManager.IMPORTANCE_DEFAULT
+        val channel = NotificationChannel(CHANNEL_ID, name, importance)
+        val notificationManager = getSystemService<NotificationManager>()
+        notificationManager?.createNotificationChannel(channel)
+    }
+
+    companion object {
+        const val CHANNEL_ID = "random_id_channel"
     }
 }

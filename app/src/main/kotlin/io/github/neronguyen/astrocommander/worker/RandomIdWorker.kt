@@ -1,12 +1,16 @@
 package io.github.neronguyen.astrocommander.worker
 
 import android.content.Context
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import arrow.core.raise.context.either
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import io.github.neronguyen.astrocommander.AscomApplication
+import io.github.neronguyen.astrocommander.R
 import io.github.neronguyen.astrocommander.core.database.dao.PlaceholderJsonDao
 import io.github.neronguyen.astrocommander.core.database.model.PlaceholderJsonEntity
 import io.github.neronguyen.astrocommander.core.network.AscomNetworkDataSource
@@ -32,7 +36,26 @@ class RandomIdWorker @AssistedInject constructor(
                 completed = result.completed
             )
             placeholderJsonDao.upsertPlaceholderJson(entity)
+            showNotification(result.id.toInt(), result.title)
         }
         return Result.retry()
+    }
+
+    private fun showNotification(id: Int, title: String) {
+        val builder = NotificationCompat.Builder(context, AscomApplication.CHANNEL_ID)
+            .setSmallIcon(R.drawable.ic_launcher_foreground) // Use a better icon if available
+            .setContentTitle("New Data Fetched")
+            .setContentText(title)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+
+        with(NotificationManagerCompat.from(context)) {
+            if (androidx.core.app.ActivityCompat.checkSelfPermission(
+                    context,
+                    android.Manifest.permission.POST_NOTIFICATIONS
+                ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+            ) {
+                notify(id, builder.build())
+            }
+        }
     }
 }
