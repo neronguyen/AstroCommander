@@ -27,7 +27,16 @@ class MainViewModel @Inject constructor(
     val list = _list.asStateFlow()
 
     init {
+        loadData()
+    }
+
+    fun refresh() {
+        loadData()
+    }
+
+    private fun loadData() {
         viewModelScope.launch {
+            _error.update { "Loading..." }
             either {
                 val networkList = networkDataSource.getPlaceholderJsonList()
                 val localIdSet = placeholderJsonDao

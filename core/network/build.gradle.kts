@@ -35,6 +35,9 @@ dependencies {
     // Arrow
     implementation(libs.arrow.core)
 
+    // Coil
+    implementation(libs.coil.kt.network.okhttp)
+
     // Hilt
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
