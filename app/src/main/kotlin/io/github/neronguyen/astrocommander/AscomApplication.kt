@@ -5,7 +5,9 @@ import android.content.Context
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.BackoffPolicy
 import androidx.work.Configuration
+import androidx.work.Constraints
 import androidx.work.ExistingWorkPolicy
+import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import coil3.ImageLoader
@@ -39,10 +41,15 @@ class AscomApplication : Application(), Configuration.Provider, SingletonImageLo
     }
 
     fun scheduleRandomIdWork() {
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
         // Only for testing. Switch to PeriodicWorkRequestBuilder for production.
         val workRequest = OneTimeWorkRequestBuilder<RandomIdWorker>()
             .setInitialDelay(15, TimeUnit.SECONDS)
             .setBackoffCriteria(BackoffPolicy.LINEAR, 15, TimeUnit.SECONDS)
+            .setConstraints(constraints)
             .build()
 
         WorkManager.getInstance(this).enqueueUniqueWork(
