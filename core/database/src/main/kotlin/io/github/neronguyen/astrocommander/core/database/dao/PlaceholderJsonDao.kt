@@ -14,4 +14,7 @@ interface PlaceholderJsonDao {
 
     @Query("SELECT * FROM PlaceholderJsonEntity")
     fun observePlaceholderJsonList(): Flow<List<PlaceholderJsonEntity>>
+
+    @Query("SELECT * FROM PlaceholderJsonEntity WHERE id = :id")
+    suspend fun getPlaceholderJson(id: Long): PlaceholderJsonEntity?
 }

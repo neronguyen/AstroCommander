@@ -4,23 +4,19 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
+import androidx.navigation3.runtime.NavEntryDecorator
+import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.runtime.rememberDecoratedNavEntries
+import androidx.navigation3.runtime.rememberNavBackStack
+import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
+import androidx.navigation3.ui.NavDisplay
 import dagger.hilt.android.AndroidEntryPoint
-import io.github.neronguyen.astrocommander.core.network.model.PlaceholderJson
 import io.github.neronguyen.astrocommander.ui.theme.AstroCommanderTheme
 
 @AndroidEntryPoint
@@ -31,57 +27,39 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             AstroCommanderTheme {
+                val backStack = rememberNavBackStack(Route.Home)
+                val decorators = listOf<NavEntryDecorator<NavKey>>(
+                    rememberSaveableStateHolderNavEntryDecorator(),
+                    rememberViewModelStoreNavEntryDecorator()
+                )
+                val provider = entryProvider<NavKey> {
+                    entry<Route.Home> {
+                        HomeRoute(
+                            onItemClick = { item -> backStack.add(Route.Detail(item)) }
+                        )
+                    }
+
+                    entry<Route.Detail> { key ->
+                        DetailRoute(
+                            item = key.item,
+                            onBack = { backStack.removeAt(backStack.size - 1) })
+                    }
+                }
+
+                val entries = rememberDecoratedNavEntries(
+                    backStack = backStack,
+                    entryDecorators = decorators,
+                    entryProvider = provider
+                )
+
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    GreetingRoute(
+                    NavDisplay(
+                        entries = entries,
+                        onBack = { backStack.removeLastOrNull() },
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
             }
-        }
-    }
-}
-
-@Composable
-fun GreetingRoute(
-    modifier: Modifier = Modifier,
-    viewModel: MainViewModel = hiltViewModel(),
-) {
-    val list by viewModel.list.collectAsStateWithLifecycle()
-    val error by viewModel.error.collectAsStateWithLifecycle()
-
-    GreetingScreen(
-        list = list,
-        error = error,
-        modifier = modifier
-    )
-}
-
-@Composable
-fun GreetingScreen(
-    list: List<PlaceholderJson>,
-    error: String,
-    modifier: Modifier = Modifier
-) {
-
-    LazyColumn(
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp)
-            .padding(top = 16.dp)
-    ) {
-        if (error.isNotEmpty()) {
-            item {
-                Text(text = error)
-            }
-        }
-
-        items(list) { item ->
-            Text(
-                text = "ID: ${item.id}",
-                style = MaterialTheme.typography.titleMedium
-            )
-            Text(text = item.title)
         }
     }
 }
