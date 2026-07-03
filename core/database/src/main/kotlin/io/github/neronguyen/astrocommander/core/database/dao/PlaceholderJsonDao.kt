@@ -13,5 +13,5 @@ interface PlaceholderJsonDao {
     suspend fun upsertPlaceholderJson(placeholderJson: PlaceholderJsonEntity)
 
     @Query("SELECT * FROM PlaceholderJsonEntity")
-    fun observePlaceholderJson(): Flow<PlaceholderJsonEntity?>
+    fun observePlaceholderJsonList(): Flow<List<PlaceholderJsonEntity>>
 }

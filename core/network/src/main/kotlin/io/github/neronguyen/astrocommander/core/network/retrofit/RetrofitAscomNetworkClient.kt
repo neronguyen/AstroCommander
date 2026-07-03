@@ -26,6 +26,9 @@ private interface RetrofitAscomNetworkApi {
     suspend fun getPlaceholderJson(
         @Path("id") id: Int
     ): Response<PlaceholderJson>
+
+    @GET("todos")
+    suspend fun getPlaceholderJsonList(): Response<List<PlaceholderJson>>
 }
 
 internal class RetrofitAscomNetworkClient(
@@ -47,6 +50,13 @@ internal class RetrofitAscomNetworkClient(
     override suspend fun getPlaceholderJson(id: Int): PlaceholderJson {
         return safeCall {
             networkClient.getPlaceholderJson(id)
+        }
+    }
+
+    context(raise: Raise<DataError.Network>)
+    override suspend fun getPlaceholderJsonList(): List<PlaceholderJson> {
+        return safeCall {
+            networkClient.getPlaceholderJsonList()
         }
     }
 

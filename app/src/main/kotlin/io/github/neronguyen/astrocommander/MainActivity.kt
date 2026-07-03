@@ -4,19 +4,23 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
+import io.github.neronguyen.astrocommander.core.network.model.PlaceholderJson
 import io.github.neronguyen.astrocommander.ui.theme.AstroCommanderTheme
 
 @AndroidEntryPoint
@@ -42,31 +46,42 @@ fun GreetingRoute(
     modifier: Modifier = Modifier,
     viewModel: MainViewModel = hiltViewModel(),
 ) {
-    val name by viewModel.name.collectAsStateWithLifecycle()
+    val list by viewModel.list.collectAsStateWithLifecycle()
+    val error by viewModel.error.collectAsStateWithLifecycle()
 
     GreetingScreen(
-        name = name,
+        list = list,
+        error = error,
         modifier = modifier
     )
 }
 
 @Composable
 fun GreetingScreen(
-    name: String,
+    list: List<PlaceholderJson>,
+    error: String,
     modifier: Modifier = Modifier
 ) {
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = modifier.fillMaxSize()
-    ) {
-        Text(text = "Hello $name!")
-    }
-}
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    AstroCommanderTheme {
-        GreetingScreen(name = "Android")
+    LazyColumn(
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+            .padding(top = 16.dp)
+    ) {
+        if (error.isNotEmpty()) {
+            item {
+                Text(text = error)
+            }
+        }
+
+        items(list) { item ->
+            Text(
+                text = "ID: ${item.id}",
+                style = MaterialTheme.typography.titleMedium
+            )
+            Text(text = item.title)
+        }
     }
 }

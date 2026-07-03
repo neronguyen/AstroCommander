@@ -8,4 +8,7 @@ interface AscomNetworkDataSource {
 
     context(raise: Raise<DataError.Network>)
     suspend fun getPlaceholderJson(id: Int): PlaceholderJson
+
+    context(raise: Raise<DataError.Network>)
+    suspend fun getPlaceholderJsonList(): List<PlaceholderJson>
 }
