@@ -37,7 +37,6 @@ android {
 
 kotlin {
     compilerOptions {
-        freeCompilerArgs.add("-XXLanguage:+ExplicitBackingFields")
         freeCompilerArgs.add("-XXLanguage:+ContextParameters")
     }
 }
@@ -64,6 +63,7 @@ dependencies {
     // Hilt
     implementation(libs.hilt.android)
     implementation(libs.hilt.ext.work)
+    implementation(libs.hilt.errorprone.annotations)
     ksp(libs.hilt.compiler)
     ksp(libs.hilt.ext.compiler)
 }
