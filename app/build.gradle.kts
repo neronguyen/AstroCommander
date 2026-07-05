@@ -34,6 +34,12 @@ android {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
     }
+
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
+    }
 }
 
 kotlin {
@@ -78,8 +84,13 @@ dependencies {
     // WorkManager
     implementation(libs.androidx.work.ktx)
 
-    // Unit Testing
+    // Local Unit Testing
     testImplementation(libs.kotlin.test.junit)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.turbine)
+
+    // Local UI Testing
+    testImplementation(libs.androidx.compose.ui.test)
+    testImplementation(libs.robolectric)
+    debugImplementation(libs.androidx.compose.ui.testManifest)
 }
