@@ -77,4 +77,9 @@ dependencies {
 
     // WorkManager
     implementation(libs.androidx.work.ktx)
+
+    // Unit Testing
+    testImplementation(libs.kotlin.test.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.turbine)
 }
