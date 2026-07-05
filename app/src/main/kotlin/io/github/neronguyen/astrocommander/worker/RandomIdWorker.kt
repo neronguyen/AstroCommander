@@ -6,46 +6,35 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import arrow.core.raise.context.either
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import io.github.neronguyen.astrocommander.AscomApplication
 import io.github.neronguyen.astrocommander.R
-import io.github.neronguyen.astrocommander.core.database.dao.PlaceholderJsonDao
-import io.github.neronguyen.astrocommander.core.database.model.PlaceholderJsonEntity
-import io.github.neronguyen.astrocommander.core.network.AscomNetworkDataSource
+import io.github.neronguyen.astrocommander.core.data.repository.PlaceholderRepository
 
 @HiltWorker
 class RandomIdWorker @AssistedInject constructor(
     @Assisted private val context: Context,
     @Assisted params: WorkerParameters,
-    private val placeholderJsonDao: PlaceholderJsonDao,
-    private val networkDataSource: AscomNetworkDataSource,
+    private val placeholderRepository: PlaceholderRepository,
 ) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result {
-        either {
-            val randomId = (1..200).random()
-            networkDataSource.getPlaceholderJson(randomId)
-        }.onLeft {
-            return Result.retry()
-        }.onRight { result ->
-            val entity = PlaceholderJsonEntity(
-                id = result.id,
-                title = "WorkManager ${result.title}",
-                completed = result.completed
-            )
-            placeholderJsonDao.upsertPlaceholderJson(entity)
-            showNotification(result.id.toInt(), result.title)
-        }
-        return Result.retry()
+        val result = placeholderRepository.syncPlaceholderList()
+        return result.fold(
+            ifLeft = { Result.retry() },
+            ifRight = {
+                showSuccessFetchNotification()
+                Result.retry()
+            }
+        )
     }
 
-    private fun showNotification(id: Int, title: String) {
+    private fun showSuccessFetchNotification() {
         val builder = NotificationCompat.Builder(context, AscomApplication.CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_launcher_foreground) // Use a better icon if available
+            .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setContentTitle("New Data Fetched")
-            .setContentText(title)
+            .setContentText("New Data Fetched")
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
 
         with(NotificationManagerCompat.from(context)) {
@@ -54,7 +43,7 @@ class RandomIdWorker @AssistedInject constructor(
                     android.Manifest.permission.POST_NOTIFICATIONS
                 ) == android.content.pm.PackageManager.PERMISSION_GRANTED
             ) {
-                notify(id, builder.build())
+                notify(1, builder.build())
             }
         }
     }

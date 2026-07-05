@@ -27,13 +27,13 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
-import io.github.neronguyen.astrocommander.core.network.model.PlaceholderJson
+import io.github.neronguyen.astrocommander.core.model.Placeholder
 
 @Composable
 fun HomeRoute(
     modifier: Modifier = Modifier,
     viewModel: MainViewModel = hiltViewModel(),
-    onItemClick: (PlaceholderJson) -> Unit
+    onItemClick: (Placeholder) -> Unit
 ) {
     val list by viewModel.list.collectAsStateWithLifecycle()
     val error by viewModel.error.collectAsStateWithLifecycle()
@@ -49,10 +49,10 @@ fun HomeRoute(
 
 @Composable
 fun HomeScreen(
-    list: List<PlaceholderJson>,
+    list: List<Placeholder>,
     error: String,
     onRefresh: () -> Unit,
-    onItemClick: (PlaceholderJson) -> Unit,
+    onItemClick: (Placeholder) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier.fillMaxSize()) {

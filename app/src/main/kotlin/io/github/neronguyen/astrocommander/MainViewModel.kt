@@ -2,57 +2,47 @@ package io.github.neronguyen.astrocommander
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import arrow.core.raise.context.either
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.github.neronguyen.astrocommander.core.database.dao.PlaceholderJsonDao
-import io.github.neronguyen.astrocommander.core.network.AscomNetworkDataSource
-import io.github.neronguyen.astrocommander.core.network.model.PlaceholderJson
+import io.github.neronguyen.astrocommander.core.data.repository.PlaceholderRepository
+import io.github.neronguyen.astrocommander.core.model.Placeholder
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val networkDataSource: AscomNetworkDataSource,
-    private val placeholderJsonDao: PlaceholderJsonDao,
+    private val placeholderRepository: PlaceholderRepository,
 ) : ViewModel() {
 
-    private val _error = MutableStateFlow("Loading...")
+    private val _error = MutableStateFlow("")
     val error = _error.asStateFlow()
 
-    private val _list = MutableStateFlow(emptyList<PlaceholderJson>())
-    val list = _list.asStateFlow()
+    val list: StateFlow<List<Placeholder>> = placeholderRepository
+        .observePlaceholderList()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
 
     init {
-        loadData()
+        refresh()
     }
 
     fun refresh() {
-        loadData()
-    }
-
-    private fun loadData() {
         viewModelScope.launch {
             _error.update { "Loading..." }
-            either {
-                val networkList = networkDataSource.getPlaceholderJsonList()
-                val localIdSet = placeholderJsonDao
-                    .observePlaceholderJsonList().first()
-                    .mapTo(HashSet()) { it.id }
-
-                networkList.map {
-                    if (it.id in localIdSet) it.copy(title = "WorkManager ${it.title}")
-                    else it
+            placeholderRepository.syncPlaceholderList()
+                .onLeft { error ->
+                    _error.update { "Error: $error" }
+                }.onRight {
+                    _error.update { "" }
                 }
-            }.onLeft { error ->
-                _error.update { "Error: $error" }
-            }.onRight { result ->
-                _error.update { "" }
-                _list.update { result }
-            }
         }
     }
 }

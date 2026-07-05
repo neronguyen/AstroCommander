@@ -24,11 +24,11 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
-import io.github.neronguyen.astrocommander.core.network.model.PlaceholderJson
+import io.github.neronguyen.astrocommander.core.model.Placeholder
 
 @Composable
 fun DetailRoute(
-    item: PlaceholderJson,
+    item: Placeholder,
     modifier: Modifier = Modifier,
     viewModel: DetailViewModel = hiltViewModel(),
     onBack: () -> Unit
@@ -46,7 +46,7 @@ fun DetailRoute(
 
 @Composable
 fun DetailScreen(
-    item: PlaceholderJson,
+    item: Placeholder,
     modifier: Modifier = Modifier,
     onBack: () -> Unit
 ) {
